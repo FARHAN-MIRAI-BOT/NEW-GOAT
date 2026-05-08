@@ -7,7 +7,7 @@ module.exports = {
     name: "aniinfo",
     aliases: ["animeinfo", "a-info"],
     version: "1.0",
-    author: "nexo_here",
+    author: "MR_FARHAN",
     countDown: 0,
     role: 0,
     description: "Get anime information using Jikan API",
