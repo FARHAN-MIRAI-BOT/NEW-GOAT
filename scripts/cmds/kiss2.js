@@ -29,46 +29,58 @@ module.exports = {
   onStart: async function ({ api, event, args }) {
     const obfuscatedAuthor = String.fromCharCode(77, 97, 104, 77, 85, 68);
     if (module.exports.config.author !== obfuscatedAuthor) {
-      return api.sendMessage("You are not authorized to change the author name.", event.threadID, event.messageID);
+      return api.sendMessage(
+        "You are not authorized to change the author name.",
+        event.threadID,
+        event.messageID
+      );
     }
 
     const { threadID, messageID, messageReply, mentions, senderID } = event;
-    const type = args[0];
 
-    if (!type) return api.sendMessage("Use: fun slap @tag", threadID, messageID);
-
-    let id = senderID;
     let id2;
 
+    // reply support
     if (messageReply) {
       id2 = messageReply.senderID;
+
+    // mention support
     } else if (Object.keys(mentions).length > 0) {
       id2 = Object.keys(mentions)[0];
-    } else if (args[1]) {
-      id2 = args[1];
+
+    // UID support
+    } else if (args[0]) {
+      id2 = args[0];
+
     } else {
-      return api.sendMessage("Mention, reply, or provide UID of the target.", threadID, messageID);
+      return api.sendMessage(
+        "👉 Reply, mention or provide UID of the target.",
+        threadID,
+        messageID
+      );
     }
 
     try {
-      const url = `${await baseApiUrl()}/api/dig?type=kiss&user=${id}&user2=${id2}`;
+      const url = `${await baseApiUrl()}/api/dig?type=kiss&user=${senderID}&user2=${id2}`;
 
       const response = await axios.get(url, { responseType: "arraybuffer" });
+
       const filePath = path.join(__dirname, `kiss_${id2}.png`);
       fs.writeFileSync(filePath, response.data);
 
       api.sendMessage(
         {
           attachment: fs.createReadStream(filePath),
-          body: `Effect kiss successful 💋`
+          body: `জান উফ সেই স্বাদ 💋`
         },
         threadID,
         () => fs.unlinkSync(filePath),
         messageID
       );
+
     } catch (err) {
       console.error(err);
-      api.sendMessage(`🥹error, contact MahMUD.`, threadID, messageID);
+      api.sendMessage("🥹 error, contact Farhan.", threadID, messageID);
     }
   }
 };
